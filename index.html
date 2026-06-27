@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F6F1E7" />
+<title>Arogya · Arogyavan</title>
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Arogya" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     AROGYA · the Arogyavan path — unified app
+     Tabs: Today · Plan · Journey · Me
+     One dish library + one diet rules engine.
+     Signature: a living lotus, petals colour by cluster
+     (body green · mind sage · soul rose-gold), pink halo behind.
+     ============================================================ */
+  :root{
+    --paper:#F6F1E7;--card:#FBF8F1;--card-2:#F1EADC;--ink:#2E2A24;--ink-soft:#6B6457;
+    --line:#E6DECF;--green:#3D6B4A;--green-soft:#6E9A78;--sage:#6E8FA0;--rose:#D98AA6;
+    --gold:#D9A441;--clay:#B07D62;--warn:#B5722E;--red:#B5483E;
+    --shadow:0 1px 2px rgba(46,42,36,.05),0 6px 22px rgba(46,42,36,.07);
+    --shadow-lift:0 2px 6px rgba(46,42,36,.08),0 14px 40px rgba(46,42,36,.12);
+    --r:18px;--r-sm:13px;--safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"DM Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+  .app{max-width:480px;margin:0 auto;min-height:100%;position:relative;background:radial-gradient(120% 55% at 50% -8%,#FBF6EC,var(--paper) 55%)}
+  h1,h2,h3,.disp{font-family:"Playfair Display",Georgia,serif;font-weight:600;letter-spacing:.1px}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .sans{font-style:italic;color:var(--green);font-weight:500}
+  .muted{color:var(--ink-soft)}
+
+  .screen{display:none;padding:22px 16px calc(118px + var(--safe-b));animation:fade .35s ease both;position:relative;z-index:1}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .top .date{font-family:"Playfair Display",serif;font-size:25px;line-height:1.12;margin-top:2px}
+  .top .greet{font-size:13px;color:var(--ink-soft);font-weight:500}
+  .goal-chip{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;color:var(--ink);flex:none}
+  .goal-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+
+  .tithi{margin:16px 0 2px;border-radius:var(--r-sm);padding:12px 14px;background:linear-gradient(100deg,#FAF0DC,#F6E8CC);border:1px solid #EAD09A;display:flex;gap:11px;align-items:center;box-shadow:var(--shadow)}
+  .tithi .ic{font-size:20px}.tithi b{font-family:"Playfair Display",serif}.tithi p{font-size:12.5px;color:#7a5e2a;margin-top:1px}
+
+  /* lotus */
+  .stage{position:relative;display:flex;flex-direction:column;align-items:center;margin:0 0 2px;z-index:1}
+  .lotus-bg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(86vw,340px);z-index:0;pointer-events:none;display:none;opacity:.62}
+  .lotus-bg.show{display:block}
+  .lotus-spacer{height:6px}
+  .read{margin-top:6px}
+  .halo{position:absolute;top:50%;left:50%;width:300px;height:300px;transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(circle, rgba(217,138,166,.22), rgba(217,138,166,.07) 45%, transparent 68%);pointer-events:none;transition:opacity 1s}
+  .lotus-wrap{position:relative;width:min(74vw,288px);aspect-ratio:1;z-index:1}
+  svg.lotus{width:100%;height:100%;overflow:visible;display:block}
+  .petal{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1);transform-box:view-box;transform-origin:200px 298px}
+  #flameOuter,#flameInner{transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1);transform-box:view-box;transform-origin:200px 298px}
+  .petal.bloom{animation:bloom 1s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes bloom{0%{opacity:.15;transform:scale(.4)}60%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  .core.lit{animation:breathe 5.5s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .clabel{position:absolute;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);text-align:center;opacity:.5;transition:.5s;pointer-events:none;white-space:nowrap}
+  .clabel .s{display:block;font-style:italic;font-weight:500;text-transform:none;font-size:9.5px;opacity:.85}
+  .clabel.on{opacity:1}
+  .clabel.body.on{color:var(--green)}.clabel.mind.on{color:var(--sage)}.clabel.soul.on{color:var(--rose)}
+  .cl-mind{top:46%;left:-2px}
+  .cl-body{bottom:2%;left:50%;transform:translateX(-50%)}
+  .cl-soul{top:-4px;left:50%;transform:translateX(-50%)}
+  .read{text-align:center;font-family:"Playfair Display",serif;font-size:17px;line-height:1.45;max-width:290px;margin:14px auto 2px}
+  .read .a{color:var(--green)}
+  .beads{display:flex;gap:7px;justify-content:center;margin:12px 0 2px}
+  .bead{width:9px;height:9px;border-radius:50%;background:var(--card-2);border:1px solid var(--line);transition:.5s}
+  .bead.on{background:var(--green);border-color:var(--green);box-shadow:0 0 0 3px rgba(61,107,74,.14)}
+
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px}
+  .sec-head h2{font-size:20px}.sec-head .eyebrow{font-size:10.5px}
+
+  /* meal rows */
+  .meal{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;font-family:"DM Sans";transition:transform .15s}
+  .meal:active{transform:scale(.99)}
+  .meal.done{background:linear-gradient(120deg,#F3F6EF,#EEF3E8);border-color:#CFE0CC}
+  .meal .mi{width:44px;height:44px;border-radius:12px;background:var(--card-2);display:grid;place-items:center;font-size:21px;flex:none;overflow:hidden}
+  .meal .mi img{width:100%;height:100%;object-fit:cover}
+  .meal .mb{flex:1;min-width:0}
+  .meal .slot{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .meal .nm{font-size:14.5px;font-weight:600;margin-top:1px}
+  .meal .tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+  .tag{font-size:10px;font-weight:600;color:var(--clay);background:#F4EBE2;border-radius:999px;padding:2px 7px}
+  .tag.fit{color:var(--green);background:#E7F0E5}.tag.warn{color:var(--warn);background:#F6EBDD}
+  .meal .st{font-size:11px;font-weight:600;flex:none}.meal .st.done{color:var(--green)}.meal .st.plan{color:var(--ink-soft)}
+
+  /* spirit cards */
+  .spirit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 11px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:transform .15s}
+  .scard:active{transform:scale(.97)}
+  .scard.done{background:linear-gradient(135deg,#F3F6EF,#EEF3E8);border-color:#CFE0CC}
+  .scard .si{font-size:23px}
+  .scard .sl{font-size:12px;font-weight:600;margin-top:6px}
+  .scard .ss{font-size:10px;color:var(--ink-soft);margin-top:1px;font-style:italic}
+  .scard .sd{font-size:10.5px;color:var(--ink-soft);margin-top:7px;line-height:1.35;min-height:28px}
+  .scard .schk{font-size:11px;color:var(--green);font-weight:600;margin-top:6px;opacity:0;transition:.3s}
+  .scard.done .schk{opacity:1}
+
+  /* plan tab */
+  .controls{display:flex;gap:9px;margin:14px 0 4px;flex-wrap:wrap}
+  .chip2{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;color:var(--ink)}
+  .chip2 .k{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .filterline{font-size:12px;color:var(--ink-soft);margin:8px 2px 0}.filterline b{color:var(--green)}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+  .day.today{border-color:var(--green-soft)}
+  .day-top{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}
+  .day-name{font-family:"Playfair Display",serif;font-size:16px}.day-name .dd{font-size:11.5px;color:var(--ink-soft);font-style:italic;margin-left:6px}
+  .day-tag{font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--green);background:#E7F0E5;border-radius:999px;padding:3px 9px;text-transform:uppercase}
+  .pmeals{padding:2px 9px 10px}
+  .pmeal{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:9px 6px;border-radius:11px;font-family:"DM Sans"}
+  .pmeal:active{background:var(--card-2)}.pmeal+.pmeal{border-top:1px solid var(--line)}
+  .pmeal .pe{font-size:19px;width:36px;height:36px;border-radius:10px;background:var(--card-2);display:grid;place-items:center;flex:none}
+  .pmeal .pb{flex:1;min-width:0}.pmeal .ps{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .pmeal .pn{font-size:14px;font-weight:600;margin-top:1px}
+  .pmeal .chev{color:var(--ink-soft)}.pmeal .chev svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+
+  /* journey */
+  .strip{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 6px;scroll-snap-type:x mandatory}
+  .strip::-webkit-scrollbar{display:none}
+  .dchip{flex:none;width:48px;padding:9px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center;cursor:pointer;scroll-snap-align:center;box-shadow:var(--shadow);transition:.2s}
+  .dchip .dow{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .dchip .dn{font-family:"Playfair Display",serif;font-size:17px;margin-top:2px}
+  .dchip .dt{width:5px;height:5px;border-radius:50%;background:var(--green);margin:4px auto 0;opacity:0}.dchip.has .dt{opacity:1}
+  .dchip.sel{background:var(--green);border-color:var(--green)}.dchip.sel .dow,.dchip.sel .dn{color:#fff}.dchip.sel .dt{background:#fff}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)}
+  .stat .n{font-family:"Playfair Display",serif;font-size:28px;line-height:1;color:var(--green)}.stat .l{font-size:11.5px;color:var(--ink-soft);margin-top:5px}
+  .balance-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-top:14px}
+  .bar-row{display:flex;align-items:center;gap:11px;margin:11px 0}.bar-row .nm{width:64px;font-size:12px;font-weight:600}
+  .bar-row .nm i{display:block;font-style:italic;font-size:10.5px;font-weight:500}
+  .bar-row.body .nm i{color:var(--green)}.bar-row.mind .nm i{color:var(--sage)}.bar-row.soul .nm i{color:var(--rose)}
+  .track{flex:1;height:9px;background:var(--card-2);border-radius:99px;overflow:hidden}
+  .fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .fill.body{background:linear-gradient(90deg,var(--green-soft),var(--green))}
+  .fill.mind{background:linear-gradient(90deg,#9DBAC6,var(--sage))}
+  .fill.soul{background:linear-gradient(90deg,#EBC0CF,var(--rose))}
+  .week-read{margin-top:14px;font-family:"Playfair Display",serif;font-size:15px;line-height:1.5}
+
+  /* me */
+  .formula{background:linear-gradient(120deg,#F3F6EF,#EFF3E9);border:1px solid #D7E4D2;border-radius:var(--r);padding:18px;text-align:center;box-shadow:var(--shadow);margin-bottom:14px}
+  .formula .big{font-family:"Playfair Display",serif;font-size:18px;line-height:1.45}.formula .big b{color:var(--green)}
+  .formula .sub{font-size:12px;color:var(--ink-soft);margin-top:7px}
+  .me-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+  .me-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);width:100%;background:none;font-family:inherit;text-align:left;border-left:none;border-right:none;border-top:none;cursor:pointer}
+  .me-row:last-child{border-bottom:none}.me-row .t{font-size:14px;font-weight:600}.me-row .d{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .me-row .link{color:var(--clay);font-size:13px;font-weight:600}
+  .switch{position:relative;width:46px;height:27px;flex:none}.switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:var(--card-2);border-radius:99px;transition:.25s;border:1px solid var(--line)}
+  .slider::before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .switch input:checked+.slider{background:var(--green);border-color:var(--green)}.switch input:checked+.slider::before{transform:translateX(19px)}
+
+  /* nav */
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;padding:9px 8px calc(9px + var(--safe-b));background:rgba(251,248,241,.88);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:30}
+  .nav button{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 14px;border-radius:12px;color:var(--ink-soft);font-family:"DM Sans";font-size:10.5px;font-weight:600;transition:color .2s}
+  .nav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .nav button.on{color:var(--green)}
+
+  /* fab */
+  .fab{position:fixed;bottom:calc(74px + var(--safe-b));right:max(16px,calc(50% - 224px));z-index:31;width:54px;height:54px;border-radius:50%;background:var(--green);border:none;cursor:pointer;box-shadow:0 6px 20px rgba(61,107,74,.35);display:grid;place-items:center;transition:transform .15s}
+  .fab:active{transform:scale(.92)}.fab svg{width:25px;height:25px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* sheet */
+  .sheet-bg{position:fixed;inset:0;background:rgba(46,42,36,.42);backdrop-filter:blur(3px);z-index:50;display:none;align-items:flex-end;justify-content:center}
+  .sheet-bg.open{display:flex;animation:fade .25s ease}
+  .sheet{width:100%;max-width:480px;background:var(--paper);border-radius:26px 26px 0 0;padding:22px 18px calc(24px + var(--safe-b));box-shadow:0 -14px 50px rgba(0,0,0,.22);animation:rise .4s cubic-bezier(.2,.8,.2,1) both;max-height:90vh;overflow:auto}
+  @keyframes rise{from{transform:translateY(100%)}to{transform:none}}
+  .grab{width:38px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 16px}
+  .sheet h2{font-size:23px}.sheet .s-slot{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .sheet .s-sub{font-size:13px;color:var(--ink-soft);margin-top:6px}
+  .s-props{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .slot-row{display:flex;gap:8px;margin-top:14px}
+  .slot-pill{flex:1;text-align:center;padding:9px;border-radius:11px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:600;cursor:pointer;text-transform:capitalize;color:var(--ink)}
+  .slot-pill.on{background:var(--green);border-color:var(--green);color:#fff}
+  .big-actions,.s-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+  .big-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;cursor:pointer;font-family:"DM Sans"}
+  .big-btn .bi{width:46px;height:46px;border-radius:13px;background:var(--card-2);display:grid;place-items:center;flex:none}
+  .big-btn .bi svg{width:22px;height:22px;stroke:var(--green);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .big-btn b{font-size:15px;display:block}.big-btn span{font-size:12px;color:var(--ink-soft)}
+  .opt-list{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;font-family:"DM Sans"}
+  .opt .oe{font-size:20px;width:38px;height:38px;border-radius:10px;background:var(--card-2);display:grid;place-items:center;flex:none}
+  .opt .ot b{font-size:14px;font-weight:600;display:block}.opt .ot span{font-size:11.5px;color:var(--ink-soft)}
+  .btn{font-family:"DM Sans";font-weight:600;border:none;cursor:pointer;border-radius:12px;padding:14px;font-size:14.5px;transition:transform .15s;width:100%}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--green);color:#fff}.btn-ghost{background:transparent;color:var(--green);border:1px solid var(--green-soft)}.btn-soft{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .scan-preview{width:100%;height:200px;border-radius:var(--r);object-fit:cover;background:var(--card-2);margin-top:14px}
+  .scan-row{display:flex;align-items:center;gap:11px;color:var(--ink-soft);font-size:14px;padding:16px 2px}
+  .spin{width:18px;height:18px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+  .result-card{background:var(--card);border:1px solid var(--green-soft);border-radius:var(--r);padding:16px;margin-top:14px}
+  .result-card .rc-top{display:flex;align-items:center;gap:12px}.result-card .rc-e{font-size:26px}.result-card .rc-nm{font-size:18px;font-family:"Playfair Display",serif}
+  .result-card .rc-conf{font-size:11.5px;color:var(--ink-soft)}.result-card .rc-line{font-size:13px;margin-top:10px}
+  .demo-note{font-size:11px;color:var(--warn);background:#F7EEE0;border-radius:8px;padding:6px 10px;margin-top:10px;text-align:center}
+  .rsec{margin-top:14px}.rsec h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+  .ing{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-bottom:1px dashed var(--line)}.ing span{color:var(--ink-soft)}
+  .step{display:flex;gap:11px;font-size:13.5px;padding:7px 0}.step .num{font-family:"Playfair Display",serif;color:var(--green);font-weight:600;width:20px;flex:none}
+  .cache-tag{display:inline-flex;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:#E7F0E5;border-radius:999px;padding:3px 9px}
+  .note-in{margin-top:11px;width:100%;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:11px;font-family:"DM Sans";font-size:13.5px;resize:none}
+
+  /* onboarding goal sheet reuse */
+  .goal-opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:15px;font-family:"DM Sans";margin-bottom:11px}
+  .goal-opt.sel{border-color:var(--green);box-shadow:0 0 0 3px rgba(61,107,74,.13)}
+  .goal-opt .gi{font-size:24px;width:46px;height:46px;border-radius:13px;background:var(--card-2);display:grid;place-items:center;flex:none}
+  .goal-opt .gt b{font-family:"Playfair Display",serif;font-size:16px}.goal-opt .gt .gs{font-style:italic;color:var(--green);font-size:13px}.goal-opt .gt p{font-size:12px;color:var(--ink-soft);margin-top:2px}
+
+  .toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%) translateY(18px);background:var(--ink);color:#FBF8F1;padding:12px 18px;border-radius:13px;font-size:13.5px;font-weight:500;z-index:60;opacity:0;pointer-events:none;transition:.3s;max-width:88%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.12s!important}}
+
+  .auth-gate{position:fixed;inset:0;z-index:200;background:radial-gradient(120% 60% at 50% 0%,#FBF6EC,var(--paper) 60%);display:none;align-items:center;justify-content:center;padding:24px}
+  .auth-card{width:100%;max-width:360px;text-align:center}
+  .auth-lotus{font-size:54px;line-height:1}
+  .auth-card h1{font-size:34px;margin-top:6px}
+  .auth-sub{font-size:14px;color:var(--ink-soft);margin:6px 0 22px}
+  .auth-card input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:14px;font-family:"DM Sans";font-size:15px;color:var(--ink);margin-bottom:10px}
+  .auth-card input:focus{outline:none;border-color:var(--green-soft);box-shadow:0 0 0 3px rgba(110,154,120,.16)}
+  .auth-err{font-size:12.5px;color:var(--clay);min-height:18px;margin:2px 0 8px;line-height:1.4}
+  .auth-card .btn{margin-top:4px}
+  .auth-link{display:block;width:100%;background:none;border:none;color:var(--green);font-family:"DM Sans";font-size:13px;font-weight:600;cursor:pointer;padding:10px 0}
+  .auth-fine{font-size:11px;color:var(--ink-soft);margin-top:18px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <div class="auth-lotus">🪷</div>
+      <h1>Arogya</h1>
+      <p class="auth-sub">Begin your path to becoming <i>arogyavan</i>.</p>
+      <input id="authEmail" type="email" inputmode="email" placeholder="you@email.com" autocomplete="email" />
+      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password" />
+      <div class="auth-err" id="authErr"></div>
+      <button class="btn btn-primary" id="authPrimary">Sign in</button>
+      <button class="auth-link" id="authToggle">New here? Create an account</button>
+      <button class="auth-link" id="authMagic">Email me a sign-in link instead</button>
+      <button class="btn btn-soft" id="authDemo" style="display:none;margin-top:12px">Continue without an account</button>
+      <p class="auth-fine">Walk gently. 🙏</p>
+    </div>
+  </div>
+
+  <!-- TODAY -->
+  <section class="screen active" id="s-today">
+    <div class="top">
+      <div><div class="greet" id="greet">Good morning</div><div class="date" id="dateLine">Today</div></div>
+      <button class="goal-chip" id="goalChip"><span class="dot"></span><span id="goalChipT">Balance</span></button>
+    </div>
+    <div id="tithiSlot"></div>
+    <div class="lotus-bg show" id="lotusBg">
+      <div class="halo" id="halo"></div>
+      <div class="lotus-wrap">
+        <svg class="lotus" viewBox="0 0 400 400" id="lotus" role="img" aria-label="Your arogyavan lotus"></svg>
+        <span class="clabel mind cl-mind" id="lbl-mind">Mind<span class="s">Mana</span></span>
+        <span class="clabel body cl-body" id="lbl-body">Body<span class="s">Sharir</span></span>
+        <span class="clabel soul cl-soul" id="lbl-soul">Soul<span class="s">Atma</span></span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="lotus-spacer"></div>
+      <div class="read" id="read"></div>
+      <div class="beads" id="beads"></div>
+    </div>
+    <div class="sec-head"><h2>Today's plate</h2><span class="eyebrow">the 80%</span></div>
+    <div id="plate"></div>
+    <div class="sec-head"><h2>Mind &amp; spirit</h2><span class="eyebrow">the 20%</span></div>
+    <div class="spirit" id="spirit"></div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="screen" id="s-plan">
+    <div class="top"><div><div class="eyebrow">Planned around your kitchen</div><div class="date">Your week</div></div></div>
+    <div class="controls">
+      <button class="chip2" id="dietChip"><span class="k">Diet</span><span id="dietVal"></span></button>
+      <button class="chip2" id="goalChip2"><span class="k">Goal</span><span id="goalVal"></span></button>
+    </div>
+    <div class="filterline" id="filterLine"></div>
+    <div style="margin-top:16px" id="weekList"></div>
+  </section>
+
+  <!-- JOURNEY -->
+  <section class="screen" id="s-journey">
+    <div class="top"><div><div class="eyebrow">Your bloom over time</div><div class="date" id="jDate">Journey</div></div></div>
+    <div class="strip" id="strip"></div>
+    <div id="jDay"></div>
+    <div class="sec-head"><h2>Last 7 days</h2></div>
+    <div class="balance-card"><div id="balanceBars"></div><div class="week-read" id="weekRead"></div></div>
+    <div class="stat-grid" id="jStats" style="margin-top:14px"></div>
+  </section>
+
+  <!-- ME -->
+  <section class="screen" id="s-me">
+    <div class="top"><div><div class="eyebrow">Your practice</div><div class="date">Me</div></div></div>
+    <div class="formula" style="margin-top:16px">
+      <div class="big">Arogyavan = <b>80%</b> food · <b>10%</b> movement · <b>10%</b> mind &amp; soul</div>
+      <div class="sub">Health is built mostly on the plate. The rest keeps it steady.</div>
+    </div>
+    <div class="me-card">
+      <button class="me-row" id="meGoal"><div><div class="t">Your path</div><div class="d" id="meGoalT"></div></div><span class="link">Change</span></button>
+      <button class="me-row" id="meDiet"><div><div class="t">Your kitchen</div><div class="d" id="meDietT"></div></div><span class="link">Change</span></button>
+      <button class="me-row" id="meRhythm"><div><div class="t">Meals a day</div><div class="d" id="meRhythmT"></div></div><span class="link">Change</span></button>
+      <div class="me-row" style="cursor:default"><div><div class="t">Preview special day</div><div class="d">See an Ekadashi plan</div></div>
+        <label class="switch"><input type="checkbox" id="previewToggle"><span class="slider"></span></label></div>
+    </div>
+    <div class="me-card"><button class="me-row" id="signOutRow"><div><div class="t">Account</div><div class="d" id="meEmail">Signed in</div></div><span class="link">Sign out</span></button></div>
+    <div class="me-card"><div class="me-row" style="cursor:default"><div><div class="t">Start fresh</div><div class="d">Clear everything</div></div>
+      <button class="link" id="resetBtn" style="background:none;border:none;color:var(--clay);font-weight:600;cursor:pointer">Reset</button></div></div>
+    <p class="muted" style="text-align:center;font-size:11.5px">Arogya · DailyLabs — the arogyavan path</p>
+  </section>
+
+  <button class="fab" id="fab" aria-label="Log a meal"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+
+  <nav class="nav" id="nav">
+    <button data-t="today" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l8 7v10a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1V10z"/></svg>Today</button>
+    <button data-t="plan"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Plan</button>
+    <button data-t="journey"><svg viewBox="0 0 24 24"><path d="M5 19c4-1 4-7 7-7s3 6 7 5M4 21c2-9 6-15 8-15s2 4 4 4"/></svg>Journey</button>
+    <button data-t="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></svg>Me</button>
+  </nav>
+
+  <div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+  <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" />
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+/* ============================================================
+   SHARED DISH LIBRARY  (seed — replace with your Dish Builder export)
+   ============================================================ */
+const F=(o={})=>Object.assign({meat:0,fish:0,egg:0,gelatin:0,onionGarlic:0,root:0,freshRoot:0,bahuBeej:0,mushroom:0,sprouts:0,dairy:0,honey:0,alcohol:0,fermented:0,hing:0,grainFree:0},o);
+const DISHES=[
+  // breakfast
+  {id:"thepla",name:"Methi Thepla",e:"🫓",meals:["breakfast"],goals:["energy","balance"],props:["warm","iron-rich"],why:"Iron-rich greens to start an active day.",f:F()},
+  {id:"poha",name:"Poha",e:"🍚",meals:["breakfast"],goals:["energy","balance"],props:["light"],why:"Light and quick — a calm morning.",f:F()},
+  {id:"moong-chilla",name:"Moong Chilla",e:"🥞",meals:["breakfast"],goals:["energy","digest"],props:["protein","light"],why:"Savoury lentil pancake — protein, easy to digest.",f:F()},
+  {id:"dhokla",name:"Dhokla",e:"🟡",meals:["breakfast"],goals:["balance"],props:["steamed","light"],why:"Steamed and light, never heavy.",f:F({fermented:1})},
+  {id:"oats",name:"Oats Porridge",e:"🥣",meals:["breakfast"],goals:["calm","balance"],props:["warm"],why:"Warm and grounding to steady the mind.",f:F({dairy:1})},
+  {id:"idli",name:"Idli & Sambar",e:"🍥",meals:["breakfast"],goals:["balance","digest"],props:["steamed","light"],why:"Soft and steamed, easy on the stomach.",f:F({fermented:1})},
+  // lunch / dinner mains
+  {id:"dal-bhat",name:"Dal & Rice",e:"🍛",meals:["lunch","dinner"],goals:["balance","energy"],props:["warm","complete"],why:"The everyday balanced plate.",f:F({dairy:1})},
+  {id:"khichdi-kadhi",name:"Khichdi & Kadhi",e:"🍲",meals:["lunch","dinner"],goals:["digest","calm","balance"],props:["warm","soothing"],why:"Comfort in a bowl — soothing and complete.",f:F({dairy:1})},
+  {id:"lauki-roti",name:"Lauki Sabzi & Roti",e:"🥒",meals:["lunch","dinner"],goals:["digest"],props:["light","warm"],why:"Bottle gourd, hydrating and light.",f:F()},
+  {id:"guj-thali",name:"Gujarati Thali",e:"🍽️",meals:["lunch"],goals:["balance"],props:["complete"],why:"A little of everything, in balance.",f:F({dairy:1})},
+  {id:"jain-pulao",name:"Jain Veg Pulao",e:"🍚",meals:["lunch"],goals:["balance"],props:["fragrant"],why:"Fragrant rice with greens, no onion or root.",f:F()},
+  {id:"chole",name:"Chole",e:"🍛",meals:["lunch"],goals:["energy"],props:["protein","hearty"],why:"Spiced chickpeas, rich and filling.",f:F({onionGarlic:1})},
+  {id:"moong-khichdi",name:"Moong Dal Khichdi",e:"🍲",meals:["dinner","lunch"],goals:["digest","calm","balance"],props:["warm","light","soothing"],why:"The gentlest dinner — light and grounding.",f:F({dairy:1})},
+  {id:"veg-soup",name:"Veg Soup & Toast",e:"🍵",meals:["dinner"],goals:["calm","digest"],props:["light","warm"],why:"Light and warm before an early night.",f:F()},
+  {id:"steamed-veg",name:"Steamed Veg & Rice",e:"🍚",meals:["dinner"],goals:["digest","calm"],props:["steamed","clean"],why:"Clean and steamed — lets the gut rest.",f:F()},
+  {id:"jeera-dal-rice",name:"Dal & Jeera Rice",e:"🍚",meals:["dinner"],goals:["balance","calm"],props:["warm","light"],why:"Cumin rice and dal — simple and calming.",f:F({dairy:1})},
+  {id:"grilled-fish",name:"Grilled Fish",e:"🐟",meals:["lunch","dinner"],goals:["energy"],props:["protein","lean"],why:"Lean protein, lightly spiced.",f:F({fish:1,onionGarlic:1})},
+  // SALADS (new) — light & raw, great for Pachan and Shanti
+  {id:"tomato-cucumber",name:"Tomato Cucumber Salad",e:"🥗",meals:["lunch","dinner","snack"],goals:["digest","balance"],props:["salad","raw","light"],why:"Cooling and crisp — no onion, Jain-friendly.",f:F()},
+  {id:"kachumber",name:"Kachumber",e:"🥗",meals:["lunch","dinner"],goals:["digest","energy"],props:["salad","raw","tangy"],why:"Classic onion-tomato-cucumber salad.",f:F({onionGarlic:1})},
+  {id:"sprout-salad",name:"Sprouted Moong Salad",e:"🥗",meals:["lunch","snack"],goals:["energy"],props:["salad","protein","raw"],why:"High-protein and fresh (note: sprouted).",f:F({sprouts:1})},
+  {id:"carrot-beet",name:"Carrot & Beet Slaw",e:"🥕",meals:["lunch","snack"],goals:["energy","balance"],props:["salad","raw","sweet"],why:"Bright, crunchy, root-vegetable rich.",f:F({root:1})},
+  {id:"fruit-chaat",name:"Fruit Chaat",e:"🍎",meals:["breakfast","snack"],goals:["energy","digest","balance"],props:["salad","raw","light"],why:"Fresh seasonal fruit — light and vegan.",f:F()},
+  {id:"cucumber-raita",name:"Cucumber Raita",e:"🥒",meals:["lunch","dinner"],goals:["digest","calm"],props:["salad","cooling"],why:"Cooling yogurt salad to calm the gut.",f:F({dairy:1})},
+  {id:"makhana-mix",name:"Roasted Makhana & Nuts",e:"🥜",meals:["snack"],goals:["calm","balance"],props:["salad","roasted","light"],why:"Dry-roasted foxnuts and nuts — a clean snack.",f:F()},
+  {id:"kosambari",name:"Kosambari",e:"🥗",meals:["lunch","snack"],goals:["digest","balance"],props:["salad","fresh"],why:"Soaked moong, coconut and lemon — light and bright.",f:F()},
+  // ---- batch 1 (50 dishes) ----
+{id:"medu-vada", name:"Medu Vada", e:"🫓", meals:["breakfast","snack"], goals:["energy","balance"], props:["protein","indulgent"], why:"", f:F()},
+  {id:"rava-dosa", name:"Rava Dosa", e:"🫓", meals:["breakfast","dinner"], goals:["digest","calm"], props:["light"], why:"", f:F()},
+  {id:"aloo-paratha", name:"Aloo Paratha", e:"🫓", meals:["breakfast","lunch"], goals:["balance"], props:["warm"], why:"", f:F({root:1,dairy:1})},
+  {id:"gobi-paratha", name:"Gobi Paratha", e:"🫓", meals:["breakfast","lunch"], goals:["balance"], props:["warm"], why:"", f:F()},
+  {id:"paneer-bhurji", name:"Paneer Bhurji", e:"🍛", meals:["lunch","dinner"], goals:["digest","calm"], props:["light","rich"], why:"", f:F({onionGarlic:1,dairy:1,freshRoot:1})},
+  {id:"dal-makhani", name:"Dal Makhani", e:"🥘", meals:["dinner"], goals:["energy","balance"], props:["protein","rich"], why:"", f:F({onionGarlic:1,dairy:1,freshRoot:1})},
+  {id:"kaju-katli", name:"Kaju Katli", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F()},
+  {id:"besan-ladoo", name:"Besan Ladoo", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"mysore-pak", name:"Mysore Pak", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"dhokli-nu-shaak", name:"Dhokli nu Shaak", e:"🍛", meals:["lunch"], goals:["balance"], props:["warm","rich"], why:"", f:F({dairy:1,hing:1})},
+  {id:"sev-tameta-nu-shaak", name:"Sev Tameta nu Shaak", e:"🍛", meals:["lunch","dinner"], goals:["balance"], props:["warm"], why:"", f:F({hing:1,freshRoot:1})},
+  {id:"bhindi-masala", name:"Bhindi Masala", e:"🍛", meals:["lunch","dinner"], goals:["balance"], props:["warm"], why:"", f:F({onionGarlic:1})},
+  {id:"aloo-gobi", name:"Aloo Gobi", e:"🍛", meals:["lunch","dinner"], goals:["balance"], props:["warm"], why:"", f:F({root:1,freshRoot:1})},
+  {id:"palak-paneer", name:"Palak Paneer", e:"🍛", meals:["dinner"], goals:["digest","calm"], props:["light","rich"], why:"", f:F({onionGarlic:1,dairy:1,freshRoot:1})},
+  {id:"kashmiri-dum-aloo", name:"Kashmiri Dum Aloo", e:"🍛", meals:["dinner"], goals:["balance"], props:["warm"], why:"", f:F({root:1,dairy:1,hing:1})},
+  {id:"veg-biryani", name:"Veg Biryani", e:"🍚", meals:["dinner"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,root:1,dairy:1,freshRoot:1})},
+  {id:"jeera-rice", name:"Jeera Rice", e:"🍚", meals:["lunch","dinner"], goals:["balance"], props:["warm"], why:"", f:F({dairy:1})},
+  {id:"dal-tadka", name:"Dal Tadka", e:"🥘", meals:["lunch","dinner"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,dairy:1,hing:1})},
+  {id:"misal-pav", name:"Misal Pav", e:"🥗", meals:["breakfast","snack"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,sprouts:1,fermented:1,freshRoot:1})},
+  {id:"vada-pav", name:"Vada Pav", e:"🫓", meals:["snack"], goals:["balance"], props:["warm","indulgent"], why:"", f:F({onionGarlic:1,root:1,fermented:1})},
+  {id:"kothimbir-vadi", name:"Kothimbir Vadi", e:"🍽️", meals:["snack"], goals:["balance"], props:["warm"], why:"", f:F({freshRoot:1})},
+  {id:"puran-poli", name:"Puran Poli", e:"🍮", meals:["lunch","snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"ukdiche-modak", name:"Ukdiche Modak", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"ragda-pattice", name:"Ragda Pattice", e:"🥗", meals:["snack"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,root:1,freshRoot:1})},
+  {id:"bhel-puri", name:"Bhel Puri", e:"🫓", meals:["snack"], goals:["balance"], props:["warm","indulgent"], why:"", f:F({onionGarlic:1,root:1})},
+  {id:"pani-puri", name:"Pani Puri", e:"🫓", meals:["snack"], goals:["energy","balance"], props:["protein","indulgent"], why:"", f:F({root:1,sprouts:1})},
+  {id:"chana-masala", name:"Chana Masala", e:"🍛", meals:["lunch","dinner"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,freshRoot:1})},
+  {id:"rajma-chawal", name:"Rajma Chawal", e:"🍽️", meals:["lunch","dinner"], goals:["energy","balance"], props:["protein"], why:"", f:F({onionGarlic:1,dairy:1,freshRoot:1})},
+  {id:"kadi-pakoda", name:"Kadi Pakoda", e:"🍮", meals:["lunch"], goals:["balance"], props:["warm","indulgent"], why:"", f:F({onionGarlic:1,dairy:1,hing:1})},
+  {id:"kachori", name:"Kachori", e:"🍽️", meals:["snack"], goals:["energy","balance"], props:["protein","indulgent"], why:"", f:F({hing:1})},
+  {id:"malai-kofta", name:"Malai Kofta", e:"🍛", meals:["dinner"], goals:["energy","balance"], props:["protein","rich"], why:"", f:F({onionGarlic:1,root:1,dairy:1,freshRoot:1})},
+  {id:"matar-paneer", name:"Matar Paneer", e:"🍛", meals:["lunch","dinner"], goals:["digest","calm"], props:["light","rich"], why:"", f:F({onionGarlic:1,dairy:1,freshRoot:1})},
+  {id:"baingan-musallam", name:"Baingan Musallam", e:"🍛", meals:["dinner"], goals:["balance"], props:["warm"], why:"", f:F({onionGarlic:1,bahuBeej:1,freshRoot:1})},
+  {id:"gujarati-kadhi", name:"Gujarati Kadhi", e:"🥘", meals:["lunch"], goals:["balance"], props:["warm"], why:"", f:F({dairy:1,hing:1,freshRoot:1})},
+  {id:"khichdi", name:"Khichdi", e:"🍚", meals:["dinner"], goals:["energy","balance"], props:["protein"], why:"", f:F({dairy:1})},
+  {id:"sambar", name:"Sambar", e:"🥘", meals:["breakfast","lunch"], goals:["digest","calm"], props:["light"], why:"", f:F({hing:1})},
+  {id:"rasam", name:"Rasam", e:"🥘", meals:["breakfast","lunch"], goals:["digest","calm"], props:["light"], why:"", f:F({onionGarlic:1,hing:1})},
+  {id:"avial", name:"Avial", e:"🍛", meals:["lunch"], goals:["balance"], props:["warm"], why:"", f:F({root:1,dairy:1})},
+  {id:"bisi-bele-bath", name:"Bisi Bele Bath", e:"🍚", meals:["lunch"], goals:["energy","balance"], props:["protein"], why:"", f:F({root:1,dairy:1})},
+  {id:"neer-dosa", name:"Neer Dosa", e:"🫓", meals:["breakfast"], goals:["digest","calm"], props:["light"], why:"", f:F()},
+  {id:"appam", name:"Appam", e:"🫓", meals:["breakfast"], goals:["digest","calm"], props:["light"], why:"", f:F({fermented:1})},
+  {id:"coconut-chutney", name:"Coconut Chutney", e:"🥣", meals:["breakfast","snack"], goals:["digest","calm"], props:["light"], why:"", f:F({freshRoot:1})},
+  {id:"tamarind-chutney", name:"Tamarind Chutney", e:"🥣", meals:["snack"], goals:["digest","calm"], props:["light"], why:"", f:F()},
+  {id:"green-chutney", name:"Green Chutney", e:"🥣", meals:["snack"], goals:["digest","calm"], props:["light"], why:"", f:F({freshRoot:1})},
+  {id:"kheer", name:"Kheer", e:"🍮", meals:["snack","dinner"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"rabdi", name:"Rabdi", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"rasgulla", name:"Rasgulla", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"gulab-jamun", name:"Gulab Jamun", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive","rich"], why:"", f:F({dairy:1})},
+  {id:"soan-papdi", name:"Soan Papdi", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+  {id:"chikki", name:"Chikki", e:"🍮", meals:["snack"], goals:["balance"], props:["sweet","festive"], why:"", f:F({dairy:1})},
+
+];
+const DIETS={
+  nonveg:{label:"Non-veg",sans:"",icon:"🍗",exclude:[],strictExclude:[]},
+  veg:{label:"Vegetarian",sans:"Shakahari",icon:"🥗",exclude:["meat","fish","egg","gelatin"],strictExclude:[]},
+  vegan:{label:"Vegan",sans:"",icon:"🌱",exclude:["meat","fish","egg","gelatin","dairy","honey"],strictExclude:[]},
+  swaminarayan:{label:"Swaminarayan",sans:"Satvik",icon:"🙏",exclude:["meat","fish","egg","gelatin","onionGarlic","alcohol"],strictExclude:[]},
+  jain:{label:"Jain",sans:"",icon:"☸️",exclude:["meat","fish","egg","gelatin","onionGarlic","root","honey","mushroom","sprouts","alcohol"],strictExclude:["fermented","freshRoot","bahuBeej","hing"]},
+};
+const DIET_ORDER=["veg","jain","swaminarayan","vegan","nonveg"];
+const GOALS={
+  energy:{label:"More Energy",sans:"Urja",icon:"⚡",tilt:{body:.6,mind:.2,soul:.2},hero:"move",blurb:"Feel less tired, steadier through the day."},
+  calm:{label:"Calm Mind",sans:"Shanti",icon:"🌙",tilt:{body:.4,mind:.35,soul:.25},hero:"mind",blurb:"Less stress, a quieter mind."},
+  digest:{label:"Better Digestion",sans:"Pachan",icon:"🌿",tilt:{body:.65,mind:.15,soul:.2},hero:"food",blurb:"A lighter gut, warm easy meals."},
+  balance:{label:"Overall Balance",sans:"Santulan",icon:"🪷",tilt:{body:.5,mind:.25,soul:.25},hero:null,blurb:"All three in harmony."},
+};
+const GOAL_ORDER=["balance","energy","calm","digest"];
+const HIDDEN_ROOTS=["onion","garlic","potato","ginger","carrot","beetroot","radish","suran","yam","arbi","mushroom","hing","asafoetida"];
+const SPECIAL={ekadashi:{name:"Ekadashi",icon:"🌅",note:"Favour fruit, milk and non-grain foods. Light and devotional.",foodFocus:"Today is Ekadashi — keep food light: fruit, milk and non-grain dishes."}};
+
+const byId=id=>DISHES.find(d=>d.id===id);
+function dietOK(dish,diet,strict){const d=DIETS[diet];const ex=d.exclude.slice();if(diet==="jain"&&strict)ex.push(...d.strictExclude);return !ex.some(f=>dish.f[f]);}
+
+/* spirit prompt pools */
+const SPIRIT={
+  move:{energy:["A brisk 15-min walk after a meal","5 surya namaskars to wake the body"],calm:["A slow 10-min walk, no phone","Gentle stretches, ending in shavasana"],digest:["A gentle 10-min walk after eating","Vajrasana for 5 minutes after a meal"],balance:["A 15-min walk in fresh air","A short sun-salutation flow"]},
+  mind:{energy:["2 minutes of slow breathing","Read one page that lifts you"],calm:["5 minutes watching the breath","Read one page of spiritual reading"],digest:["Eat one meal in silence","Two calm breaths before lunch"],balance:["5 minutes of meditation","Read one nourishing page"]},
+  soul:{energy:["A short prayer and one gratitude","Light a diya, pause for a breath"],calm:["Morning prayer, full attention","Name three things you're grateful for"],digest:["A prayer of gratitude before eating","Pause and give thanks for your food"],balance:["Morning prayer and a gratitude","Light a diya and sit a moment"]},
+};
+
+/* ============================================================
+   STATE + STORAGE
+   ============================================================ */
+const KEY="arogya.full.v1",mem={};
+const store={get(k){try{const v=localStorage.getItem(k);return v??(k in mem?mem[k]:null)}catch(e){return k in mem?mem[k]:null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}},del(k){try{localStorage.removeItem(k)}catch(e){}delete mem[k]}};
+const dkey=d=>d.toISOString().slice(0,10);
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+
+let state=load();
+function load(){
+  const r=store.get(KEY);let s;if(r){try{s=JSON.parse(r)}catch(e){}}
+  if(!s) s={onboarded:false,goal:"balance",diet:"veg",strictJain:true,previewSpecial:false,rhythm:["breakfast","lunch","dinner"],
+    logs:{},acts:{},overrides:{},journey:{startDate:dkey(TODAY),totalPetals:0,bloomDays:0}};
+  return s;
+}
+function save(){store.set(KEY,JSON.stringify(state));}
+const todayActs=()=>{const k=dkey(TODAY);return state.acts[k]=state.acts[k]||{move:false,mind:false,soul:false,soulNote:""};};
+
+/* deterministic plan per date (+ overrides) */
+function seedFrom(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rng(seed){let s=seed;return()=>{s=Math.imul(s^s>>>15,2246822507);s=Math.imul(s^s>>>13,3266489909);return((s^s>>>16)>>>0)/4294967296;};}
+function plannedFor(date){
+  const out={};const used=new Set();
+  state.rhythm.forEach(slot=>{
+    const ov=state.overrides[dkey(date)+"|"+slot];
+    if(ov){out[slot]=ov;used.add(ov);return;}
+    const r=rng(seedFrom(dkey(date)+slot));
+    let pool=DISHES.filter(d=>dietOK(d,state.diet,state.strictJain)&&d.meals.includes(slot)&&!d.f.grainFree);
+    pool=pool.map(d=>({d,s:(d.goals.includes(state.goal)?2:1)+r()})).sort((a,b)=>b.s-a.s).map(x=>x.d);
+    const pick=pool.find(d=>!used.has(d.id))||pool[0];
+    if(pick){used.add(pick.id);out[slot]=pick.id;}else out[slot]=null;
+  });
+  return out;
+}
+function poolFor(slot){return DISHES.filter(d=>dietOK(d,state.diet,state.strictJain)&&d.meals.includes(slot)&&!d.f.grainFree);}
+function lookupSpecial(){return state.previewSpecial?SPECIAL.ekadashi:null;}
+
+/* cluster maths */
+function dayClusters(date){
+  const k=dkey(date);const logs=state.logs[k]||[];const acts=state.acts[k]||{};
+  const slots=state.rhythm.length||3;
+  const food=Math.min(1,new Set(logs.map(l=>l.slot)).size/slots);
+  const body=food*0.7+(acts.move?0.3:0);
+  return {body,mind:acts.mind?1:0,soul:acts.soul?1:0,food};
+}
+function overall(c){const w=GOALS[state.goal].tilt;return c.body*w.body+c.mind*w.mind+c.soul*w.soul;}
+
+/* ============================================================
+   MODEL HOOKS — proxy to your Supabase Edge Function.
+   ============================================================ */
+const PROXY_URL="";
+/* ---- Supabase: paste your project values to turn on login + email ---- */
+const SUPABASE_URL="";
+const SUPABASE_ANON_KEY="";
+let sb=null; try{ if(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase) sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){} // "https://<project>.functions.supabase.co/anthropic"
+async function callHaiku(prompt){
+  if(!PROXY_URL) throw new Error("offline");
+  const r=await fetch(PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:700,messages:[{role:"user",content:prompt}]})});
+  const j=await r.json();return (j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+}
+async function callVision(b64,media){
+  const prompt='Identify the main Indian dish in this photo. Return ONLY JSON: {"dish":"name","confidence":"high|medium|low","foods":["item"],"warm":true,"light":true}. No prose.';
+  if(!PROXY_URL) throw new Error("offline");
+  const r=await fetch(PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:300,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:media,data:b64}},{type:"text",text:prompt}]}]})});
+  const j=await r.json();const t=(j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");return JSON.parse(t.replace(/```json|```/g,"").trim());
+}
+
+/* ============================================================
+   LOTUS
+   ============================================================ */
+const BX=200, BY=298;
+let pet=null;
+function rotPt(x,y,deg){const a=deg*Math.PI/180,c=Math.cos(a),si=Math.sin(a),dx=x-BX,dy=y-BY;return [BX+dx*c-dy*si, BY+dx*si+dy*c];}
+function petal(L,W,ang){
+  const raw=[[BX,BY],[BX-W,BY-L*0.42],[BX-W*0.5,BY-L*0.92],[BX,BY-L],[BX+W*0.5,BY-L*0.92],[BX+W,BY-L*0.42],[BX,BY]];
+  const P=raw.map(p=>{const r=rotPt(p[0],p[1],ang);return r[0].toFixed(1)+","+r[1].toFixed(1);});
+  return `M${P[0]} C${P[1]} ${P[2]} ${P[3]} C${P[4]} ${P[5]} ${P[6]} Z`;
+}
+const CL={
+  body:{grad:"gBody",stroke:"#8FB496",petals:[[-66,148,58,0.05],[66,148,58,0.34],[-101,136,54,0.6],[101,136,54,0.9]]},
+  mind:{grad:"gMind",stroke:"#A9C2CE",petals:[[-58,160,52,0.05],[58,160,52,0.5]]},
+  soul:{grad:"gSoul",stroke:"#E6B6C6",petals:[[0,170,54,0.05],[-26,150,50,0.45],[26,150,50,0.75]]},
+};
+function buildLotus(){
+  const svg=document.getElementById("lotus");
+  svg.innerHTML=`<defs>
+    <linearGradient id="gBody" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2F5A3C"/><stop offset="1" stop-color="#5C8A67"/></linearGradient>
+    <linearGradient id="gMind" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6E8FA0"/><stop offset="1" stop-color="#A6C0CE"/></linearGradient>
+    <linearGradient id="gSoul" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#D98AA6"/><stop offset="1" stop-color="#F2C2D0"/></linearGradient>
+    <radialGradient id="gCore" cx="50%" cy="62%" r="62%"><stop offset="0" stop-color="#FFF6DD"/><stop offset="55%" stop-color="#F0C45E"/><stop offset="100%" stop-color="#D9A441"/></radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="200" cy="334" rx="120" ry="15" fill="#3D6B4A" opacity="0.06"/>
+    <g id="gMindG"></g><g id="gSoulG"></g><g id="gBodyG"></g>
+    <ellipse id="coreGlow" cx="200" cy="282" rx="32" ry="46" fill="url(#gCore)" opacity="0" filter="url(#soft)"/>
+    <path id="flameOuter" d="" fill="url(#gCore)" stroke="#E9C46A" stroke-width="1.6" opacity="0.35"/>
+    <path id="flameInner" d="" fill="#FFF6DD" opacity="0"/>`;
+  svg.querySelector("#flameOuter").setAttribute("d",petal(106,42,0));
+  svg.querySelector("#flameInner").setAttribute("d",petal(72,24,0));
+  pet={};
+  for(const key of ["mind","soul","body"]){
+    const g=svg.querySelector("#g"+key.charAt(0).toUpperCase()+key.slice(1)+"G");
+    pet[key]=CL[key].petals.map(([ang,L,W,thr])=>{
+      const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d",petal(L,W,ang));
+      p.setAttribute("fill",`url(#${CL[key].grad})`);
+      p.setAttribute("stroke",CL[key].stroke);p.setAttribute("stroke-width","1.4");
+      p.setAttribute("class","petal");p.setAttribute("opacity","0.12");
+      g.appendChild(p);
+      return {el:p,thr};
+    });
+  }
+}
+function renderLotus(animKey){
+  const c=dayClusters(TODAY);
+  for(const key of ["mind","soul","body"]){
+    const fill=c[key];
+    pet[key].forEach(o=>setPetal(o.el, fill>=o.thr, animKey===key));
+    document.getElementById("lbl-"+key).classList.toggle("on",fill>=0.5);
+  }
+  const ov=overall(c);
+  document.getElementById("coreGlow").setAttribute("opacity",(ov*0.8).toFixed(2));
+  const fo=document.getElementById("flameOuter"),fi=document.getElementById("flameInner");
+  fo.style.opacity=(0.32+ov*0.68).toFixed(2); fo.style.transform=`scale(${(0.72+ov*0.28).toFixed(3)})`;
+  fi.style.opacity=ov.toFixed(2); fi.style.transform=`scale(${(0.6+ov*0.4).toFixed(3)})`;
+  document.getElementById("halo").style.opacity=(0.4+ov*0.6).toFixed(2);
+}
+function setPetal(p,on,doAnim){p.style.opacity=on?"1":"0.12";p.style.transform=on?"scale(1)":"scale(0.45)";if(on&&doAnim){p.classList.remove("bloom");void p.offsetWidth;p.classList.add("bloom");}}
+
+/* ============================================================
+   RENDER — TODAY
+   ============================================================ */
+const $=id=>document.getElementById(id);
+function partOfDay(){const h=new Date().getHours();return h<11?"morning":h<17?"afternoon":"evening";}
+function renderToday(){
+  const pod=partOfDay();
+  $("greet").textContent=pod==="morning"?"Good morning":pod==="afternoon"?"Good afternoon":"Good evening";
+  $("dateLine").textContent=TODAY.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+  $("goalChipT").innerHTML=GOALS[state.goal].label+' <span class="sans">'+GOALS[state.goal].sans+'</span>';
+  const sp=lookupSpecial();
+  $("tithiSlot").innerHTML=sp?`<div class="tithi"><div class="ic">${sp.icon}</div><div><b>${sp.name} today</b><p>${sp.note}</p></div></div>`:"";
+  renderLotus();renderBeads();renderRead();renderPlate();renderSpirit();
+}
+function renderBeads(){
+  const k=dkey(TODAY);const logged=new Set((state.logs[k]||[]).map(l=>l.slot));const a=todayActs();
+  const items=[...state.rhythm.map(s=>logged.has(s)),a.move,a.mind,a.soul];
+  $("beads").innerHTML=items.map(d=>`<span class="bead ${d?"on":""}"></span>`).join("");
+}
+function renderRead(){
+  const c=dayClusters(TODAY);const n=[c.food>=.99,todayActs().move,todayActs().mind,todayActs().soul];
+  const done=(c.food>0?1:0)+(todayActs().move?1:0)+(todayActs().mind?1:0)+(todayActs().soul?1:0);
+  let m;
+  if(done===0)m=`Your lotus is <span class="a">waiting to open</span>. Begin with one small step.`;
+  else if(c.body>=.99&&c.mind&&c.soul)m=`Fully in bloom today. <span class="a">This is arogyavan.</span>`;
+  else{const low=[["soul",c.soul,"soul petals 🪷"],["mind",c.mind,"mind petals"],["body",c.body,"body petals 🌿"]].sort((a,b)=>a[1]-b[1])[0];
+    m= low[1]<.5?`Your ${low[2]} are <span class="a">waiting</span>. A small step opens them.`:`Beautifully balanced so far — <span class="a">keep going.</span>`;}
+  $("read").innerHTML=m;
+}
+function renderPlate(){
+  const k=dkey(TODAY);const planned=plannedFor(TODAY);const logs=state.logs[k]||[];const sp=lookupSpecial();
+  $("plate").innerHTML=state.rhythm.map(slot=>{
+    const items=logs.filter(l=>l.slot===slot);const d=byId(planned[slot]);
+    if(items.length){
+      const f=items[0];const e=f.photo?`<img src="${f.photo}">`:f.e;
+      const names=items.map(x=>x.name).join(", ");
+      const tags=(f.tags||[]).slice(0,2);
+      return `<button class="meal done" data-slot="${slot}">
+        <div class="mi">${e}</div>
+        <div class="mb"><div class="slot">${slot}</div><div class="nm">${names}</div>
+          <div class="tags">${tags.map(p=>`<span class="tag ${p.k||""}">${p.v}</span>`).join("")}${items.length>1?`<span class="tag">+${items.length-1} more</span>`:""}</div></div>
+        <div class="st done">✓ eaten</div></button>`;
+    }
+    const name=d?d.name:"—";const e=d?d.e:"🍽️";const props=d?d.props.slice(0,3):[];
+    return `<button class="meal" data-slot="${slot}">
+      <div class="mi">${e}</div>
+      <div class="mb"><div class="slot">${slot}${sp&&slot==="lunch"?" · light":""}</div><div class="nm">${name}</div>
+        <div class="tags">${props.map(p=>`<span class="tag">${p}</span>`).join("")}</div></div>
+      <div class="st plan">＋ log</div></button>`;
+  }).join("");
+  $("plate").querySelectorAll(".meal").forEach(b=>b.onclick=()=>{logCtx={date:new Date(TODAY),slot:b.dataset.slot};openLogSheet();});
+}
+function renderSpirit(){
+  const a=todayActs();const g=state.goal;
+  const items=[["move","🚶","Move","Vyayam"],["mind","🧘","Mind","Mana"],["soul","🪔","Soul","Atma"]];
+  $("spirit").innerHTML=items.map(([k,ic,lab,sans])=>{
+    const prompt=pick(SPIRIT[k][g]);const done=a[k];
+    return `<div class="scard ${done?"done":""}" data-k="${k}">
+      <div class="si">${ic}</div><div class="sl">${lab}</div><div class="ss">${sans}</div>
+      <div class="sd">${done?(k==="soul"&&a.soulNote?'“'+esc(a.soulNote)+'”':"Done 🌸"):prompt}</div>
+      <div class="schk">✓ tapped</div></div>`;
+  }).join("");
+  $("spirit").querySelectorAll(".scard").forEach(el=>el.onclick=()=>{
+    const k=el.dataset.k;const a=todayActs();
+    if(a[k]){a[k]=false;if(k==="soul")a.soulNote="";state.journey.totalPetals=Math.max(0,state.journey.totalPetals-1);save();renderSpirit();renderBeads();renderRead();renderLotus();}
+    else if(k==="soul"){openSoulSheet();}
+    else{a[k]=true;state.journey.totalPetals++;save();renderSpirit();renderBeads();renderRead();renderLotus(k);toast(k==="move"?"🚶 Body thanks you":"🧘 A quieter mind");}
+  });
+}
+function openSoulSheet(){
+  $("sheet").innerHTML=`<div class="grab"></div><h2>🪔 Nourish your soul</h2>
+    <p class="s-sub">${pick(SPIRIT.soul[state.goal])}</p>
+    <textarea class="note-in" id="soulNote" rows="2" placeholder="Optional: one line of gratitude or a prayer…"></textarea>
+    <div class="s-actions"><button class="btn btn-primary" id="soulDone">Mark done</button></div>`;
+  openSheet();
+  $("soulDone").onclick=()=>{const a=todayActs();a.soul=true;a.soulNote=$("soulNote").value.trim();state.journey.totalPetals++;save();closeSheet();renderSpirit();renderBeads();renderRead();renderLotus("soul");toast("🪔 Soul tended");};
+}
+
+/* ============================================================
+   RENDER — PLAN
+   ============================================================ */
+function renderPlan(){
+  $("dietVal").innerHTML=`${DIETS[state.diet].icon} ${DIETS[state.diet].label}`;
+  $("goalVal").innerHTML=`${GOALS[state.goal].icon} ${GOALS[state.goal].label}`;
+  const total=DISHES.filter(d=>!d.f.grainFree).length;const ok=DISHES.filter(d=>dietOK(d,state.diet,state.strictJain)&&!d.f.grainFree).length;
+  $("filterLine").innerHTML=`<b>${ok}</b> of ${total} dishes fit a ${DIETS[state.diet].label} kitchen`;
+  const days=[];for(let i=0;i<7;i++)days.push(addDays(TODAY,i));
+  $("weekList").innerHTML=days.map((date,i)=>{
+    const planned=plannedFor(date);const isT=i===0;
+    const meals=state.rhythm.map(slot=>{const d=byId(planned[slot]);if(!d)return"";
+      return `<button class="pmeal" data-d="${dkey(date)}" data-slot="${slot}"><span class="pe">${d.e}</span>
+        <span class="pb"><span class="ps">${slot}</span><span class="pn">${d.name}</span></span>
+        <span class="chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></button>`;}).join("");
+    return `<div class="day ${isT?"today":""}"><div class="day-top"><div class="day-name">${date.toLocaleDateString(undefined,{weekday:"long"})} <span class="dd">${isT?"today":date.toLocaleDateString(undefined,{day:"numeric",month:"short"})}</span></div>${isT?'<span class="day-tag">Today</span>':""}</div><div class="pmeals">${meals}</div></div>`;
+  }).join("");
+  $("weekList").querySelectorAll(".pmeal").forEach(b=>b.onclick=()=>openPlanMeal(b.dataset.d,b.dataset.slot));
+}
+function openPlanMeal(dk,slot){
+  const planned=plannedFor(parseDate(dk));const d=byId(planned[slot]);
+  $("sheet").innerHTML=`<div class="grab"></div><div class="s-slot">${slot}</div><h2>${d.e} ${d.name}</h2>
+    <p class="s-sub">${d.why||""}</p><div class="s-props">${d.props.map(p=>`<span class="tag">${p}</span>`).join("")}</div>
+    <div class="s-actions"><button class="btn btn-primary" id="aRecipe">See the recipe</button>
+      <button class="btn btn-soft" id="aSwap">Swap this meal</button></div>`;
+  openSheet();
+  $("aRecipe").onclick=()=>showRecipe(d);
+  $("aSwap").onclick=()=>{
+    const pool=poolFor(slot);const used=new Set();// prefer new
+    const cur=d.id;let next=pool.find(x=>x.id!==cur)||pool[0];
+    state.overrides[dk+"|"+slot]=next.id;save();renderPlan();closeSheet();toast(`Swapped to ${next.name}`);
+  };
+}
+
+/* ============================================================
+   RENDER — JOURNEY
+   ============================================================ */
+let jSel=new Date(TODAY);
+function renderJourney(){
+  $("jDate").textContent="Journey";
+  const days=[];for(let i=-13;i<=0;i++)days.push(addDays(TODAY,i));
+  $("strip").innerHTML=days.map(d=>{const k=dkey(d);const has=(state.logs[k]&&state.logs[k].length)?"has":"";const s=k===dkey(jSel)?"sel":"";
+    return `<div class="dchip ${has} ${s}" data-d="${k}"><div class="dow">${d.toLocaleDateString(undefined,{weekday:"short"})}</div><div class="dn">${d.getDate()}</div><div class="dt"></div></div>`;}).join("");
+  $("strip").querySelectorAll(".dchip").forEach(c=>c.onclick=()=>{jSel=parseDate(c.dataset.d);renderJourney();});
+  const sel=$("strip").querySelector(".sel");if(sel)sel.scrollIntoView({inline:"center",block:"nearest"});
+  // selected day detail
+  const k=dkey(jSel);const logs=state.logs[k]||[];const planned=plannedFor(jSel);
+  const label=k===dkey(TODAY)?"Today":jSel.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
+  let html=`<div class="sec-head" style="margin-top:18px"><h2 style="font-size:17px">${label}</h2><span class="eyebrow">${logs.length} eaten</span></div>`;
+  html+= logs.length? logs.map(l=>`<div class="meal done"><div class="mi">${l.photo?`<img src="${l.photo}">`:l.e}</div><div class="mb"><div class="slot">${l.slot} · ${l.time||""}</div><div class="nm">${l.name}</div></div><div class="st done">✓</div></div>`).join("")
+    : `<div class="meal" style="cursor:default;justify-content:center;color:var(--ink-soft);font-size:13px">Nothing logged this day${k<=dkey(TODAY)?" — you can backfill from Today's plate":""}.</div>`;
+  $("jDay").innerHTML=html;
+  // last-7 balance
+  const recent=[];for(let i=-6;i<=0;i++){const c=dayClusters(addDays(TODAY,i));if(c.food||c.mind||c.soul||c.body)recent.push(c);}
+  const avg=key=>recent.length?Math.round(100*recent.reduce((s,c)=>s+c[key],0)/recent.length):0;
+  const b=avg("body"),m=avg("mind"),s=avg("soul");
+  $("balanceBars").innerHTML=[["body","Body","Sharir",b],["mind","Mind","Mana",m],["soul","Soul","Atma",s]].map(([cls,n,sa,v])=>
+    `<div class="bar-row ${cls}"><div class="nm">${n}<i>${sa}</i></div><div class="track"><div class="fill ${cls}" style="width:${v}%"></div></div></div>`).join("");
+  $("weekRead").textContent = (b+m+s===0)?"Your journey begins the moment you bloom your first petal.":
+    (()=>{const low=[["body",b],["mind",m],["soul",s]].sort((a,b)=>a[1]-b[1])[0];
+      return low[1]<Math.max(b,m,s)-20?`Your ${low[0]} has the most room to grow this week — a little attention brings the lotus into balance.`:"Mind, body and soul are growing together — the heart of arogyavan.";})();
+  const daysOn=Math.max(1,Math.round((TODAY-parseDate(state.journey.startDate))/864e5)+1);
+  $("jStats").innerHTML=`<div class="stat"><div class="n">${daysOn}</div><div class="l">days on the path</div></div>
+    <div class="stat"><div class="n">${state.journey.totalPetals}</div><div class="l">petals bloomed</div></div>`;
+}
+
+/* ============================================================
+   LOG FLOW (shared)
+   ============================================================ */
+let logCtx={date:new Date(TODAY),slot:"lunch"};
+$("fab").onclick=()=>{logCtx={date:new Date(TODAY),slot:guessSlot()};openLogSheet();};
+function guessSlot(){const h=new Date().getHours();const g=h<11?"breakfast":h<16?"lunch":"dinner";return state.rhythm.includes(g)?g:state.rhythm[0];}
+function openLogSheet(){
+  const k=dkey(logCtx.date);
+  const items=(state.logs[k]||[]).map((l,i)=>({l,i})).filter(x=>x.l.slot===logCtx.slot);
+  const itemsHtml=items.length?`<div class="opt-list" style="margin-top:6px">${items.map(({l,i})=>`<div class="opt" style="cursor:default"><span class="oe">${l.photo?`<img src="${l.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`:l.e}</span><span class="ot"><b>${l.name}</b><span>${l.time||""}</span></span><button data-rm="${i}" style="background:none;border:none;color:var(--clay);font-weight:600;cursor:pointer;font-size:12.5px">remove</button></div>`).join("")}</div>`:"";
+  $("sheet").innerHTML=`<div class="grab"></div><h2>${items.length?"Your":"Log your"} ${logCtx.slot}</h2>
+    <p class="s-sub">${logCtx.date.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"})}${items.length?` · ${items.length} added`:""}</p>
+    <div class="slot-row">${state.rhythm.map(sl=>`<button class="slot-pill ${sl===logCtx.slot?"on":""}" data-s="${sl}">${sl}</button>`).join("")}</div>
+    ${itemsHtml}
+    <div class="big-actions">
+      <button class="big-btn" id="byPhoto"><span class="bi"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><span><b>Scan a photo</b><span>${items.length?"Add another by photo":"Arogya identifies the dish"}</span></span></button>
+      <button class="big-btn" id="byList"><span class="bi"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span><span><b>${items.length?"Add more from the menu":"Pick from the menu"}</b><span>Choose one or more dishes</span></span></button>
+      ${items.length?`<button class="btn btn-ghost" id="doneLog">Done</button>`:""}</div>`;
+  openSheet();
+  $("sheet").querySelectorAll(".slot-pill").forEach(b=>b.onclick=()=>{logCtx.slot=b.dataset.s;openLogSheet();});
+  $("byPhoto").onclick=()=>$("photoInput").click();
+  $("byList").onclick=()=>pickFromList();
+  $("sheet").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const idx=+b.dataset.rm;state.logs[k].splice(idx,1);if(!state.logs[k].length)delete state.logs[k];save();refresh();openLogSheet();toast("Removed");});
+  if($("doneLog"))$("doneLog").onclick=()=>{closeSheet();};
+}
+$("photoInput").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  const dataURL=await readFile(f);showScanning(dataURL);
+  let res;try{res=await callVision(dataURL.split(",")[1],f.type||"image/jpeg");res._src="sonnet";}catch(err){
+    const pool=poolFor(logCtx.slot);const pk=pool[Math.floor(Math.random()*pool.length)]||DISHES[0];
+    res={dish:pk.name,confidence:"medium",foods:pk.props,warm:pk.props.includes("warm"),light:pk.props.includes("light"),_demo:true,_id:pk.id};}
+  showScanResult(res,dataURL);
+};
+function readFile(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});}
+function showScanning(u){$("sheet").innerHTML=`<div class="grab"></div><h2>Reading your plate…</h2><img class="scan-preview" src="${u}"><div class="scan-row"><span class="spin"></span> Arogya vision is identifying the dish…</div>`;openSheet();}
+function matchLib(name){const n=(name||"").toLowerCase();return DISHES.find(d=>n.includes(d.name.toLowerCase())||d.name.toLowerCase().includes(n));}
+function showScanResult(res,u){
+  const lib=res._id?byId(res._id):matchLib(res.dish);
+  const goalFit=lib?lib.goals.includes(state.goal):(state.goal==="digest"?res.light:res.warm);
+  const hidden=(res.foods||[]).join(" ").toLowerCase();const hit=HIDDEN_ROOTS.find(r=>hidden.includes(r));
+  const strictHit=state.diet==="jain"&&state.strictJain&&lib&&!dietOK(lib,"jain",true);
+  const tags=[];if(res.warm)tags.push({k:"fit",v:"warm"});if(res.light)tags.push({k:"fit",v:"light"});if(goalFit)tags.push({k:"fit",v:`fits ${GOALS[state.goal].sans}`});if(hit)tags.push({k:"warn",v:`has ${hit}`});if(strictHit)tags.push({k:"warn",v:"not strict-Jain"});
+  $("sheet").innerHTML=`<div class="grab"></div><h2>Is this right?</h2><img class="scan-preview" src="${u}">
+    <div class="result-card"><div class="rc-top"><span class="rc-e">${lib?lib.e:"🍽️"}</span><div><div class="rc-nm">${res.dish}</div><div class="rc-conf">${res.confidence||"medium"} confidence · ${logCtx.slot}</div></div></div>
+      <div class="rc-line">${goalFit?`A good fit for your ${GOALS[state.goal].label.toLowerCase()} path.`:`Logged. Notice how it sits with your ${GOALS[state.goal].label.toLowerCase()} goal.`}</div>
+      <div class="s-props">${tags.map(t=>`<span class="tag ${t.k}">${t.v}</span>`).join("")}</div>
+      ${(hit||strictHit)?`<div class="demo-note">⚠️ ${hit?`Contains ${hit}. `:""}${strictHit?"Not strict-Jain. ":""}Logged anyway, flagged for you.</div>`:""}
+      ${res._demo?`<div class="demo-note">Demo scan (offline). Connect your proxy for live Sonnet vision.</div>`:""}</div>
+    <div class="s-actions"><button class="btn btn-primary" id="confirmLog">Yes, log it</button><button class="btn btn-ghost" id="pickInstead">Not right — pick manually</button></div>`;
+  openSheet();
+  $("confirmLog").onclick=()=>commitLog({slot:logCtx.slot,name:res.dish,e:lib?lib.e:"🍽️",photo:u,tags});
+  $("pickInstead").onclick=()=>pickFromList();
+}
+function pickFromList(){
+  const pool=poolFor(logCtx.slot);const sel=new Set();
+  const render=()=>{
+    $("sheet").innerHTML=`<div class="grab"></div><h2>Add to your ${logCtx.slot}</h2>
+      <p class="s-sub">Tap one or more · ${DIETS[state.diet].label}${state.diet==="jain"?(state.strictJain?" · strict":" · lenient"):""}</p>
+      <div class="opt-list">${pool.map(d=>`<button class="opt" data-id="${d.id}" style="${sel.has(d.id)?"border-color:var(--green);box-shadow:0 0 0 3px rgba(61,107,74,.12)":""}"><span class="oe">${d.e}</span><span class="ot"><b>${d.name}</b><span>${d.props.join(" · ")}</span></span>${sel.has(d.id)?`<span style="color:var(--green);font-weight:700;font-size:16px">✓</span>`:""}</button>`).join("")}</div>
+      <div class="s-actions"><button class="btn btn-primary" id="addSel" ${sel.size?"":`disabled style="opacity:.5"`}>Add ${sel.size||""} ${sel.size===1?"item":"items"}</button></div>`;
+    $("sheet").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const id=b.dataset.id;sel.has(id)?sel.delete(id):sel.add(id);render();});
+    const add=$("addSel");if(add)add.onclick=()=>{if(!sel.size)return;const entries=[...sel].map(id=>{const d=byId(id);const tags=d.props.slice(0,2).map(p=>({k:"fit",v:p}));if(d.goals.includes(state.goal))tags.push({k:"fit",v:`fits ${GOALS[state.goal].sans}`});return {slot:logCtx.slot,name:d.name,e:d.e,tags};});commitMany(entries);};
+  };
+  render();openSheet();
+}
+function commitLog(entry){
+  entry.time=new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+  (state.logs[dkey(logCtx.date)]=state.logs[dkey(logCtx.date)]||[]).push(entry);
+  state.journey.totalPetals++;save();closeSheet();refresh();toast(`${entry.e} ${entry.name} logged`);
+}
+function commitMany(entries){
+  const k=dkey(logCtx.date);const arr=state.logs[k]=state.logs[k]||[];
+  const t=new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+  entries.forEach(e=>{e.time=t;arr.push(e);state.journey.totalPetals++;});
+  save();closeSheet();refresh();toast(entries.length>1?`${entries.length} items logged`:`${entries[0].e} ${entries[0].name} logged`);
+}
+
+/* ============================================================
+   RECIPE on demand (Haiku) + seed + cache
+   ============================================================ */
+const RECIPE_SEED={
+  "moong-khichdi":{time:"25 min",serves:2,ing:[["Yellow moong dal","½ cup"],["Rice","½ cup"],["Ghee","1 tbsp"],["Cumin","1 tsp"],["Turmeric","¼ tsp"],["Water","3 cups"]],steps:["Rinse rice and dal till clear.","Heat ghee, crackle cumin, add turmeric.","Add rice, dal, salt, water; pressure cook 3 whistles.","Rest, stir to a soft porridge. Serve warm."]},
+  "tomato-cucumber":{time:"8 min",serves:2,ing:[["Cucumber","1, diced"],["Tomato","2, diced"],["Lemon","½"],["Roasted cumin","½ tsp"],["Coriander","handful"],["Salt","to taste"]],steps:["Dice cucumber and tomato.","Toss with lemon, cumin and salt.","Finish with coriander. Serve fresh and cool."]},
+};
+const recipeCache={};
+async function showRecipe(d){
+  $("sheet").innerHTML=`<div class="grab"></div><div class="s-slot">${d.name}</div><h2 style="margin-bottom:6px">${d.e} Recipe</h2><div id="rbox"><div class="scan-row"><span class="spin"></span> Preparing your recipe…</div></div>`;
+  openSheet();
+  let data,src;
+  if(RECIPE_SEED[d.id]){data=RECIPE_SEED[d.id];src="library";}
+  else if(recipeCache[d.id]){data=recipeCache[d.id];src="cache";}
+  else{try{const t=await callHaiku(`Simple home recipe for "${d.name}" suited to a ${DIETS[state.diet].label} kitchen. Avoid: ${HIDDEN_ROOTS.join(", ")} if Jain. Return ONLY JSON {"time":"..","serves":2,"ing":[["item","qty"]],"steps":[".."]}.`);data=JSON.parse(t.replace(/```json|```/g,"").trim());recipeCache[d.id]=data;src="fresh";}
+    catch(e){data={time:"~25 min",serves:2,ing:[["Main ingredients for "+d.name,"as needed"],["Cumin","1 tsp"],["Turmeric","¼ tsp"],["Salt","to taste"]],steps:["Prep and rinse ingredients.","Temper cumin and turmeric in ghee or oil.","Cook gently, keeping it light and warm.","Finish to taste and serve fresh."],_demo:true};src="demo";}}
+  const tag=src==="library"?`<span class="cache-tag">✓ from your library</span>`:src==="cache"?`<span class="cache-tag">✓ cached — no API used</span>`:src==="demo"?`<span class="cache-tag">demo recipe (connect proxy)</span>`:`<span class="cache-tag">✓ generated once · now cached</span>`;
+  $("rbox").innerHTML=`${tag}<div class="rsec"><h4>${data.time} · serves ${data.serves}</h4></div>
+    <div class="rsec"><h4>Ingredients</h4>${data.ing.map(([n,q])=>`<div class="ing">${n}<span>${q}</span></div>`).join("")}</div>
+    <div class="rsec"><h4>Method</h4>${data.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join("")}</div>`;
+}
+
+/* ============================================================
+   PICKERS (goal / diet) — shared sheets
+   ============================================================ */
+function openGoalSheet(first){
+  let pending=state.goal;
+  const render=()=>{$("sheet").innerHTML=`<div class="grab"></div><h2 style="text-align:center">${first?"What do you want to feel?":"Choose your path"}</h2>
+    <p class="s-sub" style="text-align:center;margin:6px auto 16px;max-width:320px">Your food, your lotus, your day all lean toward it. Change it anytime.</p>
+    ${GOAL_ORDER.map(k=>{const g=GOALS[k];return `<button class="goal-opt ${k===pending?"sel":""}" data-k="${k}"><span class="gi">${g.icon}</span><span class="gt"><b>${g.label}</b> <span class="gs">${g.sans}</span><p>${g.blurb}</p></span></button>`;}).join("")}
+    <button class="btn btn-primary" id="goalDone" style="margin-top:8px">${first?"Begin the path":"Save"}</button>`;
+    $("sheet").querySelectorAll(".goal-opt").forEach(b=>b.onclick=()=>{pending=b.dataset.k;render();});
+    $("goalDone").onclick=()=>{const ch=state.goal!==pending;state.goal=pending;if(first)state.onboarded=true;save();closeSheet();refresh();if(ch)toast(`${GOALS[pending].icon} ${GOALS[pending].label}`);};
+  };render();openSheet();
+}
+function openDietSheet(){
+  const render=()=>{const isJain=state.diet==="jain";
+    $("sheet").innerHTML=`<div class="grab"></div><h2>Your kitchen</h2><p class="s-sub">Every plan respects this.</p>
+      <div class="opt-list">${DIET_ORDER.map(k=>{const m=DIETS[k];return `<button class="opt" data-k="${k}" style="${state.diet===k?'border-color:var(--green);box-shadow:0 0 0 3px rgba(61,107,74,.12)':''}"><span class="oe">${m.icon}</span><span class="ot"><b>${m.label}${m.sans?` · ${m.sans}`:""}</b><span>${dietSummary(k)}</span></span></button>`;}).join("")}</div>
+      ${isJain?`<div class="s-slot" style="margin-top:18px">Jain observance</div><div class="opt-list" style="margin-top:8px">
+        <button class="opt" data-toggle="strictJain" style="${state.strictJain?'border-color:var(--green)':''}"><span class="oe">${state.strictJain?"✅":"⬜"}</span><span class="ot"><b>Strict Jain</b><span>Also excludes fermented, brinjal, fresh ginger/turmeric</span></span></button>
+        <button class="opt" data-toggle="chauvihar" style="${state.chauvihar?'border-color:var(--green)':''}"><span class="oe">${state.chauvihar?"✅":"⬜"}</span><span class="ot"><b>Enforce Chauvihar</b><span>Warn when a meal is after sunset</span></span></button></div>`:""}
+      <button class="btn btn-primary" id="dietDone" style="margin-top:16px">Done</button>`;
+    $("sheet").querySelectorAll(".opt[data-k]").forEach(b=>b.onclick=()=>{state.diet=b.dataset.k;save();if(b.dataset.k==="jain")render();else{closeSheet();refresh();toast(`${DIETS[b.dataset.k].icon} ${DIETS[b.dataset.k].label}`);}});
+    $("sheet").querySelectorAll(".opt[data-toggle]").forEach(b=>b.onclick=()=>{const t=b.dataset.toggle;state[t]=!state[t];if(t==="chauvihar"&&state[t])toast("🌇 Chauvihar: meals finish before sunset — logging stays allowed.");save();render();});
+    $("dietDone").onclick=()=>{closeSheet();refresh();};
+  };render();openSheet();
+}
+function dietSummary(k){const ex=DIETS[k].exclude;if(!ex.length)return"Everything on the menu";const nice={meat:"meat",fish:"fish",egg:"egg",gelatin:"gelatin",onionGarlic:"onion & garlic",root:"root veg",honey:"honey",mushroom:"mushroom",sprouts:"sprouts",alcohol:"alcohol"};let s="No "+ex.map(f=>nice[f]).filter(Boolean).slice(0,4).join(", ");if(k==="jain")s+=state.strictJain?" · strict":" · lenient";return s;}
+
+/* ============================================================
+   NAV + helpers
+   ============================================================ */
+function go(tab){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$("s-"+tab).classList.add("active");
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
+  $("fab").style.display=(tab==="today"||tab==="journey")?"grid":"none";
+  $("lotusBg").classList.toggle("show",tab==="today");
+  if(tab==="today")renderToday();if(tab==="plan")renderPlan();if(tab==="journey")renderJourney();if(tab==="me")renderMe();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.t);});
+function refresh(){const active=document.querySelector(".screen.active").id.replace("s-","");if(active==="today")renderToday();if(active==="plan")renderPlan();if(active==="journey")renderJourney();}
+function renderMe(){$("meGoalT").textContent=GOALS[state.goal].label+" · "+GOALS[state.goal].sans;$("meDietT").textContent=DIETS[state.diet].label+(state.diet==="jain"?(state.strictJain?" · strict":" · lenient"):"");if($("meRhythmT"))$("meRhythmT").textContent=state.rhythm.map(x=>x[0].toUpperCase()+x.slice(1)).join(" · ");}
+function openRhythmSheet(){
+  const all=[["breakfast","🌅"],["lunch","🍛"],["dinner","🌙"],["snack","🍵"]];
+  const render=()=>{
+    $("sheet").innerHTML=`<div class="grab"></div><h2>Meals a day</h2>
+      <p class="s-sub">Choose the meals you want planned and logged. One or two is perfect for Chaturmas, Ekadashi or fasting days.</p>
+      <div class="opt-list">${all.map(([m,e])=>`<button class="opt" data-m="${m}" style="${state.rhythm.includes(m)?"border-color:var(--green);box-shadow:0 0 0 3px rgba(61,107,74,.12)":""}"><span class="oe">${e}</span><span class="ot"><b style="text-transform:capitalize">${m}</b><span>${state.rhythm.includes(m)?"included":"tap to add"}</span></span>${state.rhythm.includes(m)?`<span style="color:var(--green);font-weight:700">✓</span>`:""}</button>`).join("")}</div>
+      <div class="s-actions"><button class="btn btn-primary" id="rhyDone">Done</button></div>`;
+    $("sheet").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const m=b.dataset.m;const i=state.rhythm.indexOf(m);if(i>=0){if(state.rhythm.length>1)state.rhythm.splice(i,1);}else state.rhythm.push(m);state.rhythm=["breakfast","lunch","dinner","snack"].filter(x=>state.rhythm.includes(x));save();render();});
+    $("rhyDone").onclick=()=>{closeSheet();renderMe();refresh();};
+  };
+  render();openSheet();
+}
+$("goalChip").onclick=()=>openGoalSheet(false);$("goalChip2").onclick=()=>openGoalSheet(false);$("dietChip").onclick=openDietSheet;
+$("meGoal").onclick=()=>openGoalSheet(false);$("meDiet").onclick=openDietSheet;
+const _mr=$("meRhythm"); if(_mr)_mr.onclick=openRhythmSheet;
+$("previewToggle").onchange=e=>{state.previewSpecial=e.target.checked;save();refresh();toast(e.target.checked?"🌅 Previewing Ekadashi":"Back to a regular day");};
+$("resetBtn").onclick=()=>{if(confirm("Start fresh? Clears everything.")){store.del(KEY);state=load();$("previewToggle").checked=false;openGoalSheet(true);go("today");}};
+
+function pick(a){return a[Math.floor((Date.now()/864e5))%a.length];}
+function esc(s){return s.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
+function parseDate(k){const d=new Date(k);d.setHours(0,0,0,0);return d;}
+function openSheet(){$("sheetBg").classList.add("open");}function closeSheet(){$("sheetBg").classList.remove("open");}
+$("sheetBg").addEventListener("click",e=>{if(e.target===$("sheetBg"))closeSheet();});
+let tT;function toast(m){const e=$("toast");e.innerHTML=m;e.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>e.classList.remove("show"),2000);}
+
+/* seed a little history so Journey isn't empty */
+(function seed(){if(Object.keys(state.logs).length)return;const mk=(slot,id)=>{const d=byId(id);return{slot,name:d.name,e:d.e,tags:d.props.slice(0,2).map(p=>({k:"fit",v:p})),time:"1:10 PM"};};
+  state.logs[dkey(addDays(TODAY,-1))]=[mk("breakfast","thepla"),mk("lunch","khichdi-kadhi"),mk("dinner","moong-khichdi")];
+  state.acts[dkey(addDays(TODAY,-1))]={move:true,mind:true,soul:true,soulNote:""};
+  state.logs[dkey(addDays(TODAY,-2))]=[mk("lunch","dal-bhat"),mk("dinner","veg-soup")];save();})();
+
+/* ===== AUTH ===== */
+let authMode="signin";
+function gateErr(m){$("authErr").textContent=m||"";}
+function showApp(){ if(window.__booted)return; window.__booted=true; buildLotus(); $("previewToggle").checked=!!state.previewSpecial; renderToday(); if(!state.onboarded) openGoalSheet(true); }
+function continueDemo(){ state.demo=true; save(); $("authGate").style.display="none"; showApp(); }
+async function doAuth(){
+  const email=$("authEmail").value.trim(), pass=$("authPass").value;
+  if(!email||!pass){gateErr("Enter your email and password.");return;}
+  if(!sb){gateErr("Login isn't set up yet — use Continue for now.");return;}
+  gateErr(""); $("authPrimary").textContent="…";
+  try{
+    const res = authMode==="signup" ? await sb.auth.signUp({email,password:pass}) : await sb.auth.signInWithPassword({email,password:pass});
+    if(res.error){gateErr(res.error.message); $("authPrimary").textContent=authMode==="signin"?"Sign in":"Create account"; return;}
+    if(authMode==="signup" && !res.data.session){ authMode="signin"; $("authPrimary").textContent="Sign in"; gateErr("Almost there — check your email to confirm, then sign in."); return; }
+  }catch(e){ gateErr("Something went wrong. Try again."); $("authPrimary").textContent="Sign in"; }
+}
+async function magicLink(){
+  const email=$("authEmail").value.trim();
+  if(!email){gateErr("Enter your email first.");return;}
+  if(!sb){gateErr("Login isn't set up yet.");return;}
+  try{ const {error}=await sb.auth.signInWithOtp({email}); gateErr(error?error.message:"Check your email for a sign-in link. 📧"); }
+  catch(e){ gateErr("Couldn't send the link. Try again."); }
+}
+async function signOut(){ try{ if(sb) await sb.auth.signOut(); }catch(e){} location.reload(); }
+async function initAuth(){
+  const gate=$("authGate");
+  if(!sb){ $("authDemo").style.display="block"; gate.style.display="flex"; return; }
+  try{
+    const {data}=await sb.auth.getSession();
+    if(data&&data.session){ gate.style.display="none"; showApp(); } else { gate.style.display="flex"; }
+    sb.auth.onAuthStateChange((_e,session)=>{ if(session){ gate.style.display="none"; showApp(); } });
+  }catch(e){ $("authDemo").style.display="block"; gate.style.display="flex"; }
+}
+$("authPrimary").onclick=doAuth;
+$("authMagic").onclick=magicLink;
+$("authDemo").onclick=continueDemo;
+$("authToggle").onclick=()=>{ authMode=authMode==="signin"?"signup":"signin"; $("authPrimary").textContent=authMode==="signin"?"Sign in":"Create account"; $("authToggle").textContent=authMode==="signin"?"New here? Create an account":"Have an account? Sign in"; gateErr(""); };
+$("authPass").addEventListener("keydown",e=>{if(e.key==="Enter")doAuth();});
+const _signOut=$("signOutRow"); if(_signOut)_signOut.onclick=signOut;
+const _origRenderMe=renderMe;
+renderMe=function(){ _origRenderMe(); if(sb&&sb.auth){ sb.auth.getUser().then(({data})=>{ if(data&&data.user&&$("meEmail")) $("meEmail").textContent=data.user.email; }).catch(()=>{}); } else if($("meEmail")){ $("meEmail").textContent="Demo mode — no account"; } };
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{})); }
+/* boot */
+initAuth();
+</script>
+</body>
+</html>
